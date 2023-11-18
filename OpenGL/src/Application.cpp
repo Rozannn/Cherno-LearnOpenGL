@@ -10,7 +10,7 @@
 #include"VertexArray.h"
 #include"VertexBufferLayout.h"
 #include"Shader.h"
-
+#include"Texture.h"
 
 
 int main(void)
@@ -25,7 +25,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1280, 1080, "Hello World", NULL, NULL);
 
 
     if (!window)
@@ -43,19 +43,23 @@ int main(void)
     /* Make the window's context current */
 
     float positions[] = {
-       -0.5f,  -0.5f,
-       0.5f,  -0.5f,
-       0.5f,  0.5f,
-       -0.5f, 0.5f
+       -0.5f,  -0.5f, 0.0f, 0.0f,
+       0.5f,  -0.5f, 1.0f, 0.0f,
+       0.5f,  0.5f, 1.0f, 1.0f,
+       -0.5f, 0.5f, 0.0f, 1.0f
     };
     unsigned int indices[] = {
         0, 1, 2,
         2, 3, 0
     };
+    GLCall(glEnable(GL_BLEND));
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    VertexBuffer vb(positions, 6 * 2 * sizeof(float));
+    VertexBuffer vb(positions, 4 * 4 * sizeof(float));
     VertexBufferLayout layout;
     layout.Push<float>(2);
+    layout.Push<float>(2);
+
     VertexArray va;
     va.AddBuffer(vb, layout);
     IndexBuffer ib(indices, 6);
@@ -65,8 +69,11 @@ int main(void)
 
     shader.Bind();
 
-    shader.SetUniform4f("u_Color", 0.2f, 0.5f, 0.8f, 1.0f);
+    //shader.SetUniform4f("u_Color", 0.2f, 0.5f, 0.8f, 1.0f);
 
+    Texture texture("res/textures/ChernoLogo.png");
+    texture.Bind();
+    shader.SetUniform1i("u_Texture", 0);
     /* Loop until the user closes the window */
 
     va.Unbind();
@@ -84,7 +91,7 @@ int main(void)
         renderer.Clear();
         /* Swap front and back buffers */
         renderer.Draw(va, ib, shader);
-        shader.SetUniform4f("u_Color", r, 0.5f, 0.8f, 1.0f);
+        //shader.SetUniform4f("u_Color", r, 0.5f, 0.8f, 1.0f);
         if (r >= 1.0f) increment = -0.05f;
         if (r <= 0.0f) increment = 0.05f;
         r += increment;
