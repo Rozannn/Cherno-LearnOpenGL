@@ -2,15 +2,20 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
-#include<string>
-#include<sstream>
-#include"Renderer.h"
-#include"VertexBuffer.h"
-#include"IndexBuffer.h"
-#include"VertexArray.h"
-#include"VertexBufferLayout.h"
-#include"Shader.h"
-
+#include <string>
+#include <sstream>
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "VertexArray.h"
+#include "VertexBufferLayout.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+#include "tests/TestClearColor.h"
 
 
 int main(void)
@@ -25,7 +30,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1920, 1080, "Hello World", NULL, NULL);
 
 
     if (!window)
@@ -41,57 +46,39 @@ int main(void)
         std::cout << "GLEW Initial Error!" << std::endl;
     }
     /* Make the window's context current */
-
-    float positions[] = {
-       -0.5f,  -0.5f,
-       0.5f,  -0.5f,
-       0.5f,  0.5f,
-       -0.5f, 0.5f
-    };
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    VertexBuffer vb(positions, 6 * 2 * sizeof(float));
-    VertexBufferLayout layout;
-    layout.Push<float>(2);
-    VertexArray va;
-    va.AddBuffer(vb, layout);
-    IndexBuffer ib(indices, 6);
-
-
-    Shader shader("res/shaders/Basic.shader");
-
-    shader.Bind();
-
-    shader.SetUniform4f("u_Color", 0.2f, 0.5f, 0.8f, 1.0f);
-
-    /* Loop until the user closes the window */
-
-    va.Unbind();
-    vb.Unbind();
-    ib.Unbind();
-    shader.Unbind();
-
-    Renderer renderer;
-
-    float r = 0.0f;
-    float increment = 0.05f;
-    while (!glfwWindowShouldClose(window))
+    std::cout << glGetString(GL_VERSION) << std::endl;
     {
-        /* Render here */
-        renderer.Clear();
-        /* Swap front and back buffers */
-        renderer.Draw(va, ib, shader);
-        shader.SetUniform4f("u_Color", r, 0.5f, 0.8f, 1.0f);
-        if (r >= 1.0f) increment = -0.05f;
-        if (r <= 0.0f) increment = 0.05f;
-        r += increment;
-        glfwSwapBuffers(window);
-        /* Poll for and process events */
-        glfwPollEvents();
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+        Renderer renderer;
+
+        ImGui::CreateContext();
+        ImGui_ImplGlfwGL3_Init(window, true);
+        ImGui::StyleColorsDark();
+
+        test::TestClearColor testClear;
+
+        while (!glfwWindowShouldClose(window))
+        {
+            /* Render here */
+            renderer.Clear();
+
+            testClear.OnUpdate(0.0f);
+            testClear.OnRender();
+            ImGui_ImplGlfwGL3_NewFrame();
+            testClear.OnImGuiRender();
+            ImGui::Render();
+            ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+            /* Poll for and process events */
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
     }
+
+    ImGui_ImplGlfwGL3_Shutdown();
+    ImGui::DestroyContext();
+
     glfwTerminate();
     return 0;
 }
