@@ -57,7 +57,6 @@ int main(void)
         ImGui_ImplGlfwGL3_Init(window, true);
         ImGui::StyleColorsDark();
 
-        test::TestClearColor testClear;
         test::Test* currentTest;
         test::TestMenu* testMenu = new test::TestMenu(currentTest);
         currentTest = testMenu;
@@ -65,11 +64,10 @@ int main(void)
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
         while (!glfwWindowShouldClose(window))
         {
-            /* Render here */
+            GLCall(glClearColor(0.3f, 0.3f, 0.6f, 1.0f));
             renderer.Clear();
 
-            testClear.OnUpdate(0.0f);
-            testClear.OnRender();
+            ImGui_ImplGlfwGL3_NewFrame();
             if (currentTest)
             {
                 currentTest->OnUpdate(0.0f);
@@ -83,14 +81,16 @@ int main(void)
                 currentTest->OnImGuiRender();
                 ImGui::End();
             }
-            ImGui_ImplGlfwGL3_NewFrame();
-            testClear.OnImGuiRender();
+
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
             /* Poll for and process events */
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
+        delete currentTest;
+        if (currentTest != testMenu)
+            delete testMenu;
     }
 
     ImGui_ImplGlfwGL3_Shutdown();
