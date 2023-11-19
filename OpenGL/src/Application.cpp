@@ -16,7 +16,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 #include "tests/TestClearColor.h"
-
+#include "tests/TestTexture2D.h"
 
 int main(void)
 {
@@ -30,7 +30,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1920, 1440, "Hello World", NULL, NULL);
 
 
     if (!window)
@@ -62,6 +62,8 @@ int main(void)
         currentTest = testMenu;
 
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+        testMenu->RegisterTest<test::TestTexture2D>("Texture 2D");
+
         while (!glfwWindowShouldClose(window))
         {
             GLCall(glClearColor(0.3f, 0.3f, 0.6f, 1.0f));
