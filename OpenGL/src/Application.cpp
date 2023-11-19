@@ -58,7 +58,11 @@ int main(void)
         ImGui::StyleColorsDark();
 
         test::TestClearColor testClear;
+        test::Test* currentTest;
+        test::TestMenu* testMenu = new test::TestMenu(currentTest);
+        currentTest = testMenu;
 
+        testMenu->RegisterTest<test::TestClearColor>("Clear Color");
         while (!glfwWindowShouldClose(window))
         {
             /* Render here */
@@ -66,6 +70,19 @@ int main(void)
 
             testClear.OnUpdate(0.0f);
             testClear.OnRender();
+            if (currentTest)
+            {
+                currentTest->OnUpdate(0.0f);
+                currentTest->OnRender();
+                ImGui::Begin("Test");
+                if (currentTest != testMenu && ImGui::Button("< -"))
+                {
+                    delete currentTest;
+                    currentTest = testMenu;
+                }
+                currentTest->OnImGuiRender();
+                ImGui::End();
+            }
             ImGui_ImplGlfwGL3_NewFrame();
             testClear.OnImGuiRender();
             ImGui::Render();
