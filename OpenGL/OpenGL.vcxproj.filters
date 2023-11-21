@@ -901,6 +901,9 @@
     <Image Include="res\textures\ChernoLogo.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\textures\HazelLogo.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\vendor\glm\CMakeLists.txt" />
